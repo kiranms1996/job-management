@@ -1,0 +1,15 @@
+#Editor
+/.idea/
+
+## Environment specific configuration ##
+/wp-config.php
+
+/wp-content/*
+!/wp-content/plugins
+!/wp-content/themes
+!/wp-content/index.php
+
+*.log
+*.sql
+*.sqlite
+.htaccess
