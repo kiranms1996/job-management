@@ -831,6 +831,7 @@ class Job_Manager {
         $columns['job_is_featured']    = __( 'Is Featured', 'job-manager' );
         $columns['job_type']           = __( 'Job Type', 'job-manager' );
         $columns['expiry_date']        = __( 'Expires', 'job-manager' );
+        $columns['applications']       = __( 'Applications', 'job-manager' );
 
         return $columns;
     }
@@ -844,26 +845,27 @@ class Job_Manager {
     public function populate_custom_columns( $column, $post_id ) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'jobs';
-
+        $applications_table = $wpdb->prefix . 'job_applications';
+    
         // Fetch job listing data from the custom table
         $job_listing = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table_name WHERE post_id = %d", $post_id ) );
-
+    
         // Ensure job_listing exists to avoid errors
         if ( ! $job_listing ) {
             return; // No data, exit early
         }
-
+    
         switch ( $column ) {
             case 'job_position_title':
                 // Display the position title and make it a link to edit the post
                 echo '<a href="' . esc_url( get_edit_post_link( $post_id ) ) . '"><strong>' . esc_html( $job_listing->position_title ) . '</strong></a>';
                 break;
-
+    
             case 'job_company_name':
                 // Output the company name
                 echo esc_html( $job_listing->company_name );
                 break;
-
+    
             case 'job_is_featured':
                 // Display check mark for 'Yes' and red cross for 'No'
                 if ( $job_listing->is_featured ) {
@@ -872,21 +874,21 @@ class Job_Manager {
                     echo '<span style="color: red;">&#10008;</span>'; // Cross
                 }
                 break;
-
+    
             case 'job_type':
                 // Output the job type
                 echo esc_html( $job_listing->job_type );
                 break;
-
+    
             case 'expiry_date':
                 // Output the expiry date, and additional info about days left/overdue
                 if ( ! empty( $job_listing->expiry_date ) ) {
                     echo esc_html( $job_listing->expiry_date );
-
+    
                     $expiry_date = strtotime( $job_listing->expiry_date );
                     $current_date = time();
                     $days_left = ceil( ( $expiry_date - $current_date ) / ( 60 * 60 * 24 ) );
-
+    
                     // Display the number of days left or expired
                     if ( $days_left > 0 ) {
                         echo '<br><span style="color: blue;">' . $days_left . ' ' . __( 'Days Left', 'job-manager' ) . '</span>';
@@ -897,12 +899,20 @@ class Job_Manager {
                     }
                 }
                 break;
-
+    
+            case 'applications':
+                // Get the number of applications for the current job
+                $application_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $applications_table WHERE job_id = %d", $post_id ) );
+    
+                // Output the count of applications
+                echo esc_html( $application_count );
+                break;
+    
             default:
                 // If the column is not recognized, we can leave it empty or handle it as needed.
                 break;
         }
-    }
+    }    
 
     /**
     * Make the job_position_title column sortable.
