@@ -17,18 +17,15 @@ class Job_Applications {
         add_action( 'admin_menu', array( $this, 'add_job_application_view_page' ) );
     }
 
-    /**
-     * Register job_applications_list_menu
-     */
+    // Hook into the 'admin_menu' action to add custom submenu page
     public function job_applications_list_menu() {
-        add_menu_page(
-            'Applications', 
-            'Job Applications',
-            'read',
-            'job-applications',
-            array( $this, 'job_application_list_page' ), 
-            'dashicons-clipboard',
-            40
+        add_submenu_page(
+            'edit.php?post_type=job_listing',        
+            'Applications',                           
+            'Applications',                           
+            'manage_options',                      
+            'job-applications',                           
+            array( $this, 'job_application_list_page' ),
         );
     }
 
